@@ -214,10 +214,23 @@ public class GUI extends JFrame
     {
         e=-1;
         int x = table1.getColumnCount();
+            
         int y = table1.getRowCount();
-        String[][] s = new String[y][x];
-        for(int i=0; i<y; i++)
+        
+        for(int i=0; i<table1.getRowCount();i++)
         {
+            if(table1.getValueAt(i, 1) == null || table1.getValueAt(i, 1) == "")
+            {
+                y = i;
+                break;
+            }
+        }
+        
+        String[][] s = new String[y][x];
+        
+        for(int i=0; i<y; i++)
+        {   
+            
             for (int j = 0; j < x; j++) 
             {
                 s[i][j] = (String)table1.getValueAt(i,j);

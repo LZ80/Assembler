@@ -7,6 +7,9 @@ package assembler;
 
 import UI.GUI;
 import static com.sun.corba.se.impl.util.Utility.printStackTrace;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 /**
  *
@@ -18,8 +21,19 @@ public class Assembler {
      * @param args the command line arguments
      */
     
+    
+    
+    public enum tokenType
+    {
+        NONE,
+        REGISTER,
+        HL,
+        NUMBER,
+        MEM
+    }
+    
     static String[][] s;
-    static Hashtable<String, Instruction> labels;
+    static Hashtable<String, Integer> labels;
     //static Hashtable<String, Symbol> symbols;
     static ArrayList<Instruction> instructions;
     static ArrayList<String> memory;
@@ -34,6 +48,7 @@ public class Assembler {
         
         labels = new Hashtable<>();
         instructions = new ArrayList<>();
+        memory = new ArrayList<>();
         
         do
         {
@@ -41,15 +56,12 @@ public class Assembler {
             x = gui.ejecutar();
             if(x==1)
             {
-                try{
                     x=-1;
                     init();
                     ejecutar();
-                }catch(Exception e)
-                {
-                    printStackTrace();
-                    gui.error();
-                }
+                
+                  
+                
             }
         }while(x!=0);
     }
@@ -64,11 +76,17 @@ public class Assembler {
     public static void ejecutar()
     {
         fillTables();
-        for(int i=0; i<instructions.size(); i++)
+        for(int i=0; i < instructions.size(); i++)
         {
             parseInstruction(instructions.get(i));
         }
-        
+        try
+        {
+            writeMemory();
+        }catch(IOException e)
+        {
+            System.out.println("ERROR");
+        }
     }
 
     public static void fillTables()
@@ -88,58 +106,190 @@ public class Assembler {
     
     public static String parseInstruction(Instruction ins)
     {
-        String m;
+        if(ins.getLabel() != null && ins.getLabel() != "")
+        {
+            labels.put(ins.getLabel(), memDir);
+            
+        }
+        
+        System.out.println(ins.getInstruction());
         
         switch(ins.getInstruction())
         {
             case "LD":
-                m = parseLoad(ins);
+                parseLoad(ins);
                 break;
             case "ADD":
-                m = parseAdd(ins);
+                parseAdd(ins);
                 break;
             case "SUB":
-                m = parseSub(ins);
+                parseSub(ins);
                 break;
             case "J":
-                m = parseJump(ins);
+                parseJump(ins);
                 break;
             default:
                 System.out.println("ERROR");
                 break;
-        }   
+        }
+        
         return "m";
     }
 
     public static String parseLoad(Instruction ins) 
     {
-        recognizePattern(ins.getOperand());        
+        String s = "";
         
+        tokenType o = recognizePattern(ins.getOperand());        
+        tokenType p = recognizePattern(ins.getParameter());
+        
+        if((o == tokenType.REGISTER || o == tokenType.HL) && (p == tokenType.REGISTER || p == tokenType.HL))
+        {
+            
+            s = s + "01" + parseRegister(ins.getOperand()) + parseRegister(ins.getParameter());
+            memory.add(s);
+            memDir++;
+        }
+        else if((o == tokenType.REGISTER || o == tokenType.HL) && p == tokenType.NUMBER)
+        {
+            s = s + "00" + parseRegister(ins.getOperand()) + "110";
+            
+            memory.add(s);
+            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter(), 16)));
+            memDir += 2;
+        }
+        else if(o == tokenType.REGISTER  && p == tokenType.MEM)
+        {
+            s = s + Integer.toBinaryString(Integer.parseInt("3A",16));
+            
+            memory.add(s);
+            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
+            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5),16)));
+        }
+        
+        System.out.println(memory);
         return "";
     }
 
     public static String parseAdd(Instruction ins) 
     {
+        String instruccion;
+        
+        tokenType o = recognizePattern(ins.getOperand());        
+        tokenType p = recognizePattern(ins.getParameter());
+        
         return "";
     }
 
     public static String parseSub(Instruction ins) 
     {
+        String instruccion;
+        
+        tokenType o = recognizePattern(ins.getOperand());        
+        tokenType p = recognizePattern(ins.getParameter());
+        
         return "";
     }
 
     public static String parseJump(Instruction ins) 
     {
+        String instruccion;
+        
+        tokenType o = recognizePattern(ins.getOperand());        
+        tokenType p = recognizePattern(ins.getParameter());
+        
+        return "";
+    }
+    
+    public static tokenType recognizePattern(String i)
+    {
+        System.out.println(i);
+        if(i.length() == 1)
+        {
+            char first = i.charAt(0);
+        
+            if((65 <= first && first <= 69) || first==72 || first==76)
+            {
+                return tokenType.REGISTER;
+            }
+        }    
+        else if(i.length() == 2)
+        {
+            if(((48 <= i.charAt(0) && i.charAt(0) <=57) || (65 <= i.charAt(0) && i.charAt(0) <= 70)) && ((48 <= i.charAt(1) && i.charAt(1) <=57) || (65 <= i.charAt(1) && i.charAt(1) <= 70)))
+            {
+                return tokenType.NUMBER;
+            }
+        }
+        else if(i.length() == 4)
+        {
+            if(i.charAt(0) == '(' && i.charAt(3) == ')')
+            {
+                if(i.charAt(1) == 'H' && i.charAt(2) == 'L')
+                {
+                    return tokenType.HL;
+                }
+            }
+        }
+        else if(i.length() == 6)
+        {   
+            return tokenType.MEM;               
+        }
+        return tokenType.NONE;
+    }
+    
+    public static String parseRegister(String s)
+    {
+        switch(s)
+        {
+            case "A":
+                return "111";
+            case "B":
+                return "000";
+            case "C":
+                return "001";
+            case "D":
+                return "010";
+            case "E":
+                return "011";
+            case "H":
+                return "100";
+            case "L":
+                return "101";
+            case "HL":
+                return "110";
+        }
+        
         return "";
     }
     
     
-    public static int recognizePattern(String i)
+    
+    public static void writeMemory () throws IOException
     {
-        return 0;
+        String mem = "xx";
+        
+        
+        for(int i=0; i < memory.size(); i++)
+        {
+            
+            String s = Integer.toHexString(Integer.parseInt(memory.get(i),2));
+            
+            if(s.length() == 2)
+            {   
+                
+                mem = mem + s + "xx";
+            }
+            else
+            {
+                mem = mem + "0" + s + "xx";
+            }
+        }
+        
+        BufferedWriter writer = new BufferedWriter(new FileWriter("./memory.txt"));
+        
+        writer.write(mem);
+        
+        writer.close();
     }
-    
-    
-    
     
 }
