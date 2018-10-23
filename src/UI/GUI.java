@@ -27,12 +27,8 @@ public class GUI extends JFrame
     private JButton clearTable;
     private JButton salir;
     private JScrollPane scrollPane1;
-    private JScrollPane scrollPane2;
     private JTable table1;
-    private JTable table3;
     private DefaultTableModel tm;
-    private JComboBox<String> combo;
-    private MyTable tb;
     DefaultTableModel t;
     
     private DefaultTableCellRenderer renderer;
@@ -49,17 +45,20 @@ public class GUI extends JFrame
     public void init()
     {
         e = -1;
-        setTitle("XiAssembler");
+        setTitle("Z80 Assembler");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(640, 480);
+        setSize(800, 600);
         setVisible(true);
-        
-        tb = new MyTable();
+
         
         panel = new JPanel();
         panel.setLayout(null);
         insets = panel.getInsets();
         panel.setVisible(true);
+        
+        int top = (550 - insets.top - 400)/2;
+        int left = ( 800 - 500)/2;
+        
         
         ejecutar = new JButton("Ejecutar");
         ejecutar.addActionListener(new java.awt.event.ActionListener()
@@ -69,11 +68,11 @@ public class GUI extends JFrame
                 ejecutarActionPerformed(event); 
             }
         });
-        ejecutar.setBounds(insets.left + 305, insets.top + 185, 100, 30);
+        ejecutar.setBounds(insets.left + left + 250 - 50, insets.top + top + 350 + 50, 100, 30);
         panel.add(ejecutar);
                 
-        ImageIcon icon = new ImageIcon("icon.png"); 
         
+        ImageIcon icon = new ImageIcon("icon.png"); 
         addRow = new JButton("", icon);
         addRow.addActionListener(new java.awt.event.ActionListener()
         {
@@ -82,7 +81,7 @@ public class GUI extends JFrame
                 addRowActionPerformed(event); 
             }
         });
-        addRow.setBounds(insets.left + 35, insets.top + 100, 20, 20);
+        addRow.setBounds(insets.left + left - 20, insets.top + top, 20, 20);
         addRow.setBorder(new BevelBorder(BevelBorder.RAISED));
         panel.add(addRow);
         
@@ -96,14 +95,14 @@ public class GUI extends JFrame
                 clearTableActionPerformed(event); 
             }
         });
-        clearTable.setBounds(insets.left + 280, insets.top + 100, 20, 20);
+        clearTable.setBounds(insets.left + left + 500, insets.top + top, 20, 20);
         clearTable.setBorder(new BevelBorder(BevelBorder.RAISED));
         panel.add(clearTable);
         
         renderer = new DefaultTableCellRenderer();
         renderer.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
         
-        tm = new DefaultTableModel(new Object[]{"Label", "Nemonic", "Operator"},10);
+        tm = new DefaultTableModel(new Object[]{ "Label", "Instruction", "Operator", "Parameter" },20);
         table1 = new JTable(tm);
  
         
@@ -114,48 +113,11 @@ public class GUI extends JFrame
         table1.getColumnModel().getColumn(2).setCellRenderer(renderer);
         table1.setVisible(true);
         //fillTable1();
-        
+
         
         scrollPane1 = new JScrollPane(table1);
-        scrollPane1.setBounds(insets.left + 55, insets.top + 100, 225, 200);
+        scrollPane1.setBounds(insets.left + left, insets.top + top, 500, 350);
         panel.add(scrollPane1);
-        
-        /*table2 = new JTable(11,2);
-        table2.setEnabled(false);
-        table2.setBackground(Color.lightGray);
-        table2.setAlignmentX(CENTER_ALIGNMENT);
-        table2.setRowHeight(20);
-        table2.getColumnModel().getColumn(0).setHeaderValue("Address");
-        table2.getColumnModel().getColumn(1).setHeaderValue("Value");
-        table2.getColumnModel().getColumn(0).setCellRenderer(renderer);
-        table2.getColumnModel().getColumn(1).setCellRenderer(renderer);
-        table2.setVisible(true);
-        
-        scrollPane2 = new JScrollPane(table2);
-        scrollPane2.setBounds(insets.left + 430, insets.top + 100, 150, 200);
-        panel.add(scrollPane2);
-        */
-        combo = new JComboBox<>();
-        combo.setBounds(insets.left + 55, insets.top + 30, 100, 30);
-        combo.addItem("GPC V1");
-        combo.addItem("GPC V2");
-        //combo.addItem("GPC V3");
-        //combo.addItem("GPC V4");
-        panel.add(combo);
-        
-        t  = new DefaultTableModel(new Object[]{"Addresses", "Values"}, 11);
-        table3 = new JTable(t);
-        table3.setEnabled(false);
-        table3.setBackground(Color.lightGray);
-        table3.setRowHeight(20);
-        table3.getColumnModel().getColumn(0).setCellRenderer(renderer);
-        table3.getColumnModel().getColumn(1).setCellRenderer(renderer);
-        table3.setVisible(true);
-        
-        JScrollPane scrollPane3 = new JScrollPane(table3);
-        scrollPane3.setBounds(insets.left + 430, insets.top + 100, 150, 200);
-        panel.add(scrollPane3);
-        
         this.add(panel);
         panel.setBounds(0,0,640,480);
     }
@@ -173,21 +135,13 @@ public class GUI extends JFrame
     public void clearTableActionPerformed(java.awt.event.ActionEvent e)
     {
         tm.setRowCount(0);
-        tm.setRowCount(10);
+        tm.setRowCount(20);
         tm.fireTableDataChanged();
-        t.setRowCount(0);
-        t.setRowCount(10);
-        t.fireTableDataChanged();
     }
     
     public int ejecutar()
     {
         return e;
-    }
-    
-    public String getMode()
-    {
-        return (String)combo.getSelectedItem();
     }
     
     public void fillTable1()
@@ -254,18 +208,6 @@ public class GUI extends JFrame
             table1.setValueAt(s[i][1], i, 1);
             table1.setValueAt(s[i][2], i, 2);
         }
-    }
-    
-    public void fillTable2(Object[][] finalTable)
-    {
-        Object[] tableHeaders = {"Address", "Value"};
-        
-        table3.getColumnModel().getColumn(0).setCellRenderer(renderer);
-        table3.getColumnModel().getColumn(1).setCellRenderer(renderer);
-        table3.setBackground(Color.white);
-        t.setRowCount(0);
-        t.setDataVector(finalTable, tableHeaders);
-        t.fireTableDataChanged();
     }
     
     public String[][] getTable1()
