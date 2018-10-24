@@ -71,6 +71,8 @@ public class Assembler {
     {
         instructions.clear();
         labels.clear();
+        memory.clear();
+        memDir = 0;
         //symbols.clear();
     }
     
@@ -398,41 +400,44 @@ public class Assembler {
     
     public static tokenType recognizePattern(String i)
     {
-        
-        if(labels.containsKey(i))
+        if(i != null && i != "")
         {
-            return tokenType.LABEL;
-        }
-        
-        if(i.length() == 1)
-        {
-            char first = i.charAt(0);
-        
-            if((65 <= first && first <= 69) || first==72 || first==76)
+            if(labels.containsKey(i))
             {
-                return tokenType.REGISTER;
+                return tokenType.LABEL;
             }
-        }    
-        else if(i.length() == 2)
-        {
-            if(((48 <= i.charAt(0) && i.charAt(0) <=57) || (65 <= i.charAt(0) && i.charAt(0) <= 70)) && ((48 <= i.charAt(1) && i.charAt(1) <=57) || (65 <= i.charAt(1) && i.charAt(1) <= 70)))
+        
+        
+            if(i.length() == 1)
             {
-                return tokenType.NUMBER;
-            }
-        }
-        else if(i.length() == 4)
-        {
-            if(i.charAt(0) == '(' && i.charAt(3) == ')')
-            {
-                if(i.charAt(1) == 'H' && i.charAt(2) == 'L')
+                char first = i.charAt(0);
+
+                if((65 <= first && first <= 69) || first==72 || first==76)
                 {
-                    return tokenType.HL;
+                    return tokenType.REGISTER;
+                }
+            }    
+            else if(i.length() == 2)
+            {
+                if(((48 <= i.charAt(0) && i.charAt(0) <=57) || (65 <= i.charAt(0) && i.charAt(0) <= 70)) && ((48 <= i.charAt(1) && i.charAt(1) <=57) || (65 <= i.charAt(1) && i.charAt(1) <= 70)))
+                {
+                    return tokenType.NUMBER;
                 }
             }
-        }
-        else if(i.length() == 6)
-        {   
-            return tokenType.MEM;               
+            else if(i.length() == 4)
+            {
+                if(i.charAt(0) == '(' && i.charAt(3) == ')')
+                {
+                    if(i.charAt(1) == 'H' && i.charAt(2) == 'L')
+                    {
+                        return tokenType.HL;
+                    }
+                }
+            }
+            else if(i.length() == 6)
+            {   
+                return tokenType.MEM;               
+            }
         }
         return tokenType.NONE;
     }

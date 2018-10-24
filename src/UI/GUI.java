@@ -31,6 +31,10 @@ public class GUI extends JFrame
     private DefaultTableModel tm;
     DefaultTableModel t;
     
+    private JButton example1;
+    private JButton example2;
+    private JButton example3;
+    
     private DefaultTableCellRenderer renderer;
     Insets insets;
     
@@ -70,7 +74,57 @@ public class GUI extends JFrame
         });
         ejecutar.setBounds(insets.left + left + 250 - 50, insets.top + top + 350 + 50, 100, 30);
         panel.add(ejecutar);
-                
+             
+        
+        example1 = new JButton("Ejemplo 1");
+        example1.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent event) 
+            {
+                example1ActionPerformed(event); 
+            }
+
+            private void example1ActionPerformed(ActionEvent event) {
+                example1();
+            }
+        });
+        example1.setBounds(insets.left + 15, insets.top + top, 100, 30);
+        panel.add(example1);
+        
+        
+        example2 = new JButton("Ejemplo 2");
+        example2.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent event) 
+            {
+                example2ActionPerformed(event); 
+            }
+
+            private void example2ActionPerformed(ActionEvent event) {
+                example2();
+            }
+        });
+        example2.setBounds(insets.left + 15, insets.top + top + 100, 100, 30);
+        panel.add(example2);
+        
+        
+        example3 = new JButton("Ejemplo 3");
+        example3.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent event) 
+            {
+                example3ActionPerformed(event); 
+            }
+
+            private void example3ActionPerformed(ActionEvent event) {
+                example3();
+            }
+        });
+        example3.setBounds(insets.left + 15, insets.top + top + 200, 100, 30);
+        panel.add(example3);
+        
+        
+        
         
         ImageIcon icon = new ImageIcon("icon.png"); 
         addRow = new JButton("", icon);
@@ -114,7 +168,6 @@ public class GUI extends JFrame
         table1.getColumnModel().getColumn(2).setCellRenderer(renderer);
         table1.getColumnModel().getColumn(3).setCellRenderer(renderer);
         table1.setVisible(true);
-        fillTable1();
 
         
         scrollPane1 = new JScrollPane(table1);
@@ -146,52 +199,19 @@ public class GUI extends JFrame
         return e;
     }
     
-    public void fillTable1()
-    {
-        /*table1.setValueAt(null, 0, 0);
-        table1.setValueAt("INA", 0, 1);
-        table1.setValueAt(null, 0, 2);
-        table1.setValueAt(null, 1, 0);
-        table1.setValueAt("STOREA", 1, 1);
-        table1.setValueAt("X", 1, 2);
-        table1.setValueAt(null, 2, 0);
-        table1.setValueAt("INA", 2, 1);
-        table1.setValueAt(null, 2, 2);
-        table1.setValueAt(null, 3, 0);
-        table1.setValueAt("STOREA", 3, 1);
-        table1.setValueAt("Y", 3, 2);
-        table1.setValueAt(null, 4, 0);
-        table1.setValueAt("LOADA", 4, 1);
-        table1.setValueAt("X", 4, 2);
-        table1.setValueAt(null, 5, 0);
-        table1.setValueAt("ADDA", 5, 1);
-        table1.setValueAt("Y", 5, 2);
-        table1.setValueAt(null, 6, 0);
-        table1.setValueAt("STOREA", 6, 1);
-        table1.setValueAt("S", 6, 2);
-        table1.setValueAt(null, 7, 0);
-        table1.setValueAt("LOADA", 7, 1);
-        table1.setValueAt("S", 7, 2);
-        table1.setValueAt(null, 8, 0);
-        table1.setValueAt("OUTA", 8, 1);
-        table1.setValueAt(null, 8, 2);
-        table1.setValueAt("FIN", 9, 0);
-        table1.setValueAt("LOADA", 9, 1);
-        table1.setValueAt("ONE", 9, 2);
-        table1.setValueAt(null, 10, 0);
-        table1.setValueAt("JPOS", 10, 1);
-        table1.setValueAt("FIN", 10, 2);*/
-        
+    public void example1()
+    {   
         String[][] s = {{null,"LD","A","0A"},
                         {null,"LD","B","0B"},
                         {null,"SUB","A","B"},
                         {null,"JP","NZ","Label_Neg"},
                         {null,"LD","A","00"},
+                        {null,"LD","A","C"},
                         {null,"HALT","",""},
                         {"Label_Neg","LD","A","01"},
                         {null,"HALT","",""}};
         
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 9; i++)
         {
             if(table1.getRowCount() <= s.length)
             {
@@ -203,6 +223,56 @@ public class GUI extends JFrame
             table1.setValueAt(s[i][3], i, 3);
         }
     }
+    
+    public void example2()
+    {
+        String[][] s = {{null,"LD","B","02"},
+                        {null,"LD","C","03"},
+                        {"Label_Start","LD","A","B"},
+                        {null,"ADD","A","A"},
+                        {null,"LD","B","A"},
+                        {null,"LD","A","C"},
+                        {null,"SUB","A","01"},
+                        {null,"LD","C","A"},
+                        {null,"JP","NZ","Label_Finish"},
+                        {null,"JP",null,"Label_Start"},
+                        {"Label_Finish","HALT",null,null}};
+        
+        for (int i = 0; i < 11; i++)
+        {
+            if(table1.getRowCount() <= s.length)
+            {
+                tm.addRow(new Object[]{null,null,null,null});
+            }
+            table1.setValueAt(s[i][0], i, 0);
+            table1.setValueAt(s[i][1], i, 1);
+            table1.setValueAt(s[i][2], i, 2);
+            table1.setValueAt(s[i][3], i, 3);
+        }
+    }
+    
+    public void example3()
+    {
+        String[][] s = {{null,"LD","B","02"},
+                        {null,"LD","C","FF"},
+                        {"Label_Start","LD","A","B"},
+                        {null,"JP","NZ","Label_Start"},
+                        {null,"HALT", null, null}};
+        
+        for (int i = 0; i < 5; i++)
+        {
+            if(table1.getRowCount() <= s.length)
+            {
+                tm.addRow(new Object[]{null,null,null,null});
+            }
+            table1.setValueAt(s[i][0], i, 0);
+            table1.setValueAt(s[i][1], i, 1);
+            table1.setValueAt(s[i][2], i, 2);
+            table1.setValueAt(s[i][3], i, 3);
+        }
+    }
+    
+    
     
     public String[][] getTable1()
     {
