@@ -248,7 +248,7 @@ public class GUI extends JFrame
                         {null,"JP",null,"Label_Start"},
                         {"Label_Finish","HALT",null,null}};
         
-        for (int i = 0; i < 11; i++)
+        for (int i = 0; i < 12; i++)
         {
             if(table1.getRowCount() <= s.length)
             {
