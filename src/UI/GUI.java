@@ -189,6 +189,11 @@ public class GUI extends JFrame
     
     public void clearTableActionPerformed(java.awt.event.ActionEvent e)
     {
+        clearTable();
+    }
+    
+    public void clearTable()
+    {
         tm.setRowCount(0);
         tm.setRowCount(20);
         tm.fireTableDataChanged();
@@ -200,7 +205,9 @@ public class GUI extends JFrame
     }
     
     public void example1()
-    {   
+    {
+        clearTable();
+        
         String[][] s = {{null,"LD","A","0A"},
                         {null,"LD","B","0B"},
                         {null,"SUB","A","B"},
@@ -226,6 +233,8 @@ public class GUI extends JFrame
     
     public void example2()
     {
+        clearTable();
+        
         String[][] s = {{null,"LD","B","02"},
                         {null,"LD","C","03"},
                         {"Label_Start","LD","A","B"},
@@ -253,6 +262,8 @@ public class GUI extends JFrame
     
     public void example3()
     {
+        clearTable();
+        
         String[][] s = {{null,"LD","B","02"},
                         {null,"LD","C","FF"},
                         {"Label_Start","LD","A","B"},
