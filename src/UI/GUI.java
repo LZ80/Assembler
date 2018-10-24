@@ -114,7 +114,7 @@ public class GUI extends JFrame
         table1.getColumnModel().getColumn(2).setCellRenderer(renderer);
         table1.getColumnModel().getColumn(3).setCellRenderer(renderer);
         table1.setVisible(true);
-        //fillTable1();
+        fillTable1();
 
         
         scrollPane1 = new JScrollPane(table1);
@@ -182,33 +182,25 @@ public class GUI extends JFrame
         table1.setValueAt("JPOS", 10, 1);
         table1.setValueAt("FIN", 10, 2);*/
         
-        String[][] s = {{null,"INA",null},
-                        {null,"STOREA","X"},
-                        {null,"LOADA","X"},
-                        {null,"SUBA","C17"},
-                        {null,"JPOS","TRUE"},
-                        {null,"LOADA","ONE"},
-                        {null,"JPOS","FALSE"},
-                        {"TRUE","LOADA","C93"},
-                        {null,"STOREA","Y"},
-                        {null,"LOADA","ONE"},
-                        {null,"JPOS","ENDIF"},
-                        {"FALSE","LOADA","CM47"},
-                        {null,"STOREA","Y"},
-                        {"ENDIF","LOADA","Y"},
-                        {null,"OUTA",null},
-                        {"FIN","LOADA","ONE"},
-                        {null,"JPOS","FIN"}};
+        String[][] s = {{null,"LD","A","0A"},
+                        {null,"LD","B","0B"},
+                        {null,"SUB","A","B"},
+                        {null,"JP","NZ","Label_Neg"},
+                        {null,"LD","A","00"},
+                        {null,"HALT","",""},
+                        {"Label_Neg","LD","A","01"},
+                        {null,"HALT","",""}};
         
-        for (int i = 0; i < 17; i++)
+        for (int i = 0; i < 8; i++)
         {
             if(table1.getRowCount() <= s.length)
             {
-                tm.addRow(new Object[]{null,null,null});
+                tm.addRow(new Object[]{null,null,null,null});
             }
             table1.setValueAt(s[i][0], i, 0);
             table1.setValueAt(s[i][1], i, 1);
             table1.setValueAt(s[i][2], i, 2);
+            table1.setValueAt(s[i][3], i, 3);
         }
     }
     

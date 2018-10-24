@@ -143,7 +143,7 @@ public class Assembler {
                 parseCompare(ins);
                 break;
             case "HALT":
-                parseCompare(ins);
+                parseHalt(ins);
                 break;
             default:
                 System.out.println("Instruccion no encontrada. Line: " + Integer.toString(memDir + 1));
@@ -182,8 +182,9 @@ public class Assembler {
             s = s + Integer.toBinaryString(Integer.parseInt("3A",16));
             
             memory.add(s);
-            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
             memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5),16)));
+            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
+            
             memDir +=3;
         }
         else if(o == tokenType.REGISTER  && p == tokenType.LABEL)
@@ -197,8 +198,9 @@ public class Assembler {
             String a = String.format("%04X", m);
 
             memory.add(s);
-            memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
             memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(2,4),16)));
+            memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
+            
             memDir +=3;
         }
         
@@ -263,16 +265,20 @@ public class Assembler {
         tokenType o = recognizePattern(ins.getOperand());        
         tokenType p = recognizePattern(ins.getParameter());
         
-        if(o == tokenType.NONE && p == tokenType.MEM)
+        String op = ins.getOperand();
+        
+        
+        if((op == null || op == "") && p == tokenType.MEM)
         {
             s = s + Integer.toBinaryString(Integer.parseInt("C3",16));
 
             memory.add(s);
-            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
             memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5),16)));
+            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
+            
             memDir +=3;
         }
-        else if(o == tokenType.NONE && p == tokenType.LABEL)
+        else if((op == null || op == "") && p == tokenType.LABEL)
         {
             s = s + Integer.toBinaryString(Integer.parseInt("C3",16));
 
@@ -281,8 +287,9 @@ public class Assembler {
             String a = String.format("%04X", m);
 
             memory.add(s);
-            memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
             memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(2,4),16)));
+            memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
+            
             memDir +=3;
         }
         else
@@ -294,8 +301,9 @@ public class Assembler {
                     s = s + Integer.toBinaryString(Integer.parseInt("CA",16));
                     
                     memory.add(s);
-                    memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
                     memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5),16)));
+                    memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
+                    
                     memDir +=3;
                 }
                 else if(p == tokenType.LABEL)
@@ -308,8 +316,9 @@ public class Assembler {
                     String a = String.format("%04X", m);
 
                     memory.add(s);
-                    memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
                     memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(2,4),16)));
+                    memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
+                    
                     memDir +=3;
                 }
             }
@@ -321,8 +330,9 @@ public class Assembler {
                     
                     
                     memory.add(s);
-                    memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
                     memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5),16)));
+                    memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
+                    
                     memDir +=3;
                 }
                 else if(p == tokenType.LABEL)
@@ -334,8 +344,9 @@ public class Assembler {
                     String a = String.format("%04X", m);
 
                     memory.add(s);
-                    memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
                     memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(2,4),16)));
+                    memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
+                    
                     memDir +=3;
                 }
             }
