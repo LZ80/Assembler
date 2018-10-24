@@ -268,10 +268,11 @@ public class GUI extends JFrame
         String[][] s = {{null,"LD","B","02"},
                         {null,"LD","C","FF"},
                         {"Label_Start","LD","A","B"},
+                        {null,"LD","A","C"},
                         {null,"JP","NZ","Label_Start"},
                         {null,"HALT", null, null}};
         
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 6; i++)
         {
             if(table1.getRowCount() <= s.length)
             {
