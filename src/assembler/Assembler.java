@@ -513,7 +513,7 @@ public class Assembler {
             }
         }
         
-        BufferedWriter writer = new BufferedWriter(new FileWriter("./memory.txt"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("./Memory.txt"));
         
         writer.write(mem);
         
