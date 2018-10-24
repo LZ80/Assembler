@@ -90,6 +90,7 @@ public class GUI extends JFrame
         clearTable = new JButton("", icon2);
         clearTable.addActionListener(new java.awt.event.ActionListener()
         {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent event) 
             {
                 clearTableActionPerformed(event); 
@@ -245,8 +246,8 @@ public class GUI extends JFrame
         return vWindow.InValues(sym);
     }
     
-    public void error()
+    public void error(String s)
     {
-        JOptionPane.showMessageDialog(this, "ERROR");
+        JOptionPane.showMessageDialog(this, s);
     }
 }
