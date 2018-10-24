@@ -77,6 +77,17 @@ public class Assembler {
     public static void ejecutar()
     {
         fillTables();
+        
+        for(int i=0; i < instructions.size(); i++)
+        {
+            if(instructions.get(i).getLabel() != null && instructions.get(i).getLabel() != "")
+            {
+                labels.put(instructions.get(i).getLabel(), -1);
+            }
+        }
+        
+        doLabels();
+        
         for(int i=0; i < instructions.size(); i++)
         {
             parseInstruction(instructions.get(i));
@@ -107,13 +118,12 @@ public class Assembler {
     
     public static String parseInstruction(Instruction ins)
     {
-        if(ins.getLabel() != null && ins.getLabel() != "")
+        /*if(ins.getLabel() != null && ins.getLabel() != "")
         {
             labels.put(ins.getLabel(), memDir);
             
-        }
+        }*/
         
-        System.out.println(ins.getInstruction());
         
         switch(ins.getInstruction())
         {
@@ -132,6 +142,9 @@ public class Assembler {
             case "CP":
                 parseCompare(ins);
                 break;
+            case "HALT":
+                parseCompare(ins);
+                break;
             default:
                 System.out.println("Instruccion no encontrada. Line: " + Integer.toString(memDir + 1));
                 break;
@@ -146,6 +159,8 @@ public class Assembler {
         
         tokenType o = recognizePattern(ins.getOperand());        
         tokenType p = recognizePattern(ins.getParameter());
+        System.out.println(ins.getInstruction());
+        System.out.println(p);
         
         if((o == tokenType.REGISTER || o == tokenType.HL) && (p == tokenType.REGISTER || p == tokenType.HL))
         {
@@ -169,9 +184,24 @@ public class Assembler {
             memory.add(s);
             memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
             memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5),16)));
+            memDir +=3;
+        }
+        else if(o == tokenType.REGISTER  && p == tokenType.LABEL)
+        {
+            System.out.println("sadas");
+            
+            s = s + Integer.toBinaryString(Integer.parseInt("3A",16));
+            
+            int m = labels.get(ins.getParameter());
+                    
+            String a = String.format("%04X", m);
+
+            memory.add(s);
+            memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
+            memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(2,4),16)));
+            memDir +=3;
         }
         
-        System.out.println(memory);
         return "";
     }
 
@@ -240,6 +270,7 @@ public class Assembler {
             memory.add(s);
             memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
             memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5),16)));
+            memDir +=3;
         }
         else if(o == tokenType.NONE && p == tokenType.LABEL)
         {
@@ -252,6 +283,7 @@ public class Assembler {
             memory.add(s);
             memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
             memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(2,4),16)));
+            memDir +=3;
         }
         else
         {
@@ -260,12 +292,15 @@ public class Assembler {
                 if(p == tokenType.MEM)
                 {
                     s = s + Integer.toBinaryString(Integer.parseInt("CA",16));
-
+                    
+                    memory.add(s);
                     memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
                     memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5),16)));
+                    memDir +=3;
                 }
                 else if(p == tokenType.LABEL)
                 {
+                    
                     s = s + Integer.toBinaryString(Integer.parseInt("CA",16));
                     
                     int m = labels.get(ins.getParameter());
@@ -275,6 +310,7 @@ public class Assembler {
                     memory.add(s);
                     memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
                     memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(2,4),16)));
+                    memDir +=3;
                 }
             }
             else if(ins.getOperand() == "NZ")
@@ -282,9 +318,12 @@ public class Assembler {
                 if(p == tokenType.MEM)
                 {
                     s = s + Integer.toBinaryString(Integer.parseInt("C2",16));
-
+                    
+                    
+                    memory.add(s);
                     memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16)));
                     memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5),16)));
+                    memDir +=3;
                 }
                 else if(p == tokenType.LABEL)
                 {
@@ -297,6 +336,7 @@ public class Assembler {
                     memory.add(s);
                     memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0,2),16)));
                     memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(2,4),16)));
+                    memDir +=3;
                 }
             }
         }
@@ -317,6 +357,7 @@ public class Assembler {
                 s = s + "10111" + parseRegister(ins.getOperand());
                 
                 memory.add(s);
+                memDir++;
             }
             else if(o == tokenType.NUMBER)
             {
@@ -324,21 +365,30 @@ public class Assembler {
                 
                 memory.add(s);
                 memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter(), 16)));
+                memDir += 2;
             }
             else if(o == tokenType.HL)
             {
                 s = s + "10111110";
+                memDir++;
             }
         }
         
         return "";
     }
     
+    public static String parseHalt(Instruction ins)
+    {
+        memory.add("01110110");
+        memDir++;
+        
+        return "";
+    }
     
     public static tokenType recognizePattern(String i)
     {
         
-        if(labels.contains(i))
+        if(labels.containsKey(i))
         {
             return tokenType.LABEL;
         }
@@ -401,7 +451,35 @@ public class Assembler {
         return "";
     }
     
-    
+    public static void doLabels()
+    {
+        int m = 0;
+        
+        for(int i=0; i < instructions.size(); i++)
+        {
+            String label = instructions.get(i).getLabel();
+            
+            tokenType p = recognizePattern(instructions.get(i).getParameter());
+            
+            if(label != null && label != "")
+            {
+                labels.put(label, m);
+            }
+            
+            if(p == tokenType.NUMBER)
+            {
+                m += 2;
+            }
+            else if(p == tokenType.MEM || p== tokenType.LABEL)
+            {
+                m += 3;
+            }
+            else
+            {
+                m++;
+            }
+        }
+    }
     
     public static void writeMemory () throws IOException
     {
@@ -432,3 +510,4 @@ public class Assembler {
     }
     
 }
+ 

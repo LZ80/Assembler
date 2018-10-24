@@ -60,7 +60,7 @@ public class GUI extends JFrame
         int left = ( 800 - 500)/2;
         
         
-        ejecutar = new JButton("Ejecutar");
+        ejecutar = new JButton("Generar Archivo de Texto");
         ejecutar.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent event) 
@@ -112,6 +112,7 @@ public class GUI extends JFrame
         table1.getColumnModel().getColumn(0).setCellRenderer(renderer);
         table1.getColumnModel().getColumn(1).setCellRenderer(renderer);
         table1.getColumnModel().getColumn(2).setCellRenderer(renderer);
+        table1.getColumnModel().getColumn(3).setCellRenderer(renderer);
         table1.setVisible(true);
         //fillTable1();
 
