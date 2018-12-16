@@ -91,9 +91,8 @@ public class Assembler {
 
     public static void ejecutar() {
         fillTables();
-        return;
         
-        /*for (int i = 0; i < instructions.size(); i++) {
+        for (int i = 0; i < instructions.size(); i++) {
             if (instructions.get(i).getLabel() != null && instructions.get(i).getLabel() != "") {
                 labels.put(instructions.get(i).getLabel(), -1);
             }
@@ -108,7 +107,7 @@ public class Assembler {
             writeMemory();
         } catch (IOException e) {
             System.out.println("ERROR");
-        }*/
+        }
     }
 
     public static void fillTables() {
@@ -118,10 +117,10 @@ public class Assembler {
         
         for(String instruction : ins)
         {
+            instruction = instruction.substring(0, instruction.length()-1);
             String[] aux = instruction.split(",");
             String[] aux2 = aux[0].split(" ");
-            
-            String label = null, command = null, operator = null, target = null;
+            String label = null, command = null, operator = null, parameter = null;
             
             if(aux2.length == 3)
             {
@@ -136,18 +135,18 @@ public class Assembler {
             }
             else
             {
-                command=aux2[1];
+                command=aux2[0];
             }
             
             if(aux.length == 2)
             {
-                target=aux[1];
+                parameter=aux[1];   
             }
             
-            Instruction in = new Instruction(label, command, operator, target);
+            Instruction in = new Instruction(label, command, operator, parameter);
             instructions.add(in);
             
-            System.out.println(in);
+            System.out.println("fillTables " + in);
         }
         
         return;
@@ -161,7 +160,7 @@ public class Assembler {
         
     }
 
-    public static String parseInstruction(Instruction ins) {
+    public static void parseInstruction(Instruction ins) {
         /*
          * if(ins.getLabel() != null && ins.getLabel() != "") {
          * labels.put(ins.getLabel(), memDir);
@@ -193,16 +192,16 @@ public class Assembler {
             break;
         }
 
-        return "m";
+        return;
     }
 
     public static String parseLoad(Instruction ins) {
         String s = "";
-
+        System.out.println(ins.getParameter());
         tokenType o = recognizePattern(ins.getOperand());
         tokenType p = recognizePattern(ins.getParameter());
-        System.out.println(ins.getInstruction());
-        System.out.println(p);
+        System.out.println("ins " + ins.getInstruction());
+        System.out.println(ins.getParameter() + "p " + p);
 
         if ((o == tokenType.REGISTER || o == tokenType.HL) && (p == tokenType.REGISTER || p == tokenType.HL)) {
 
@@ -399,7 +398,7 @@ public class Assembler {
     }
 
     public static tokenType recognizePattern(String i) {
-        if (i != null && i != "") {
+        if (i != null && !i.equals("")) {
             if (labels.containsKey(i)) {
                 return tokenType.LABEL;
             }
@@ -411,6 +410,7 @@ public class Assembler {
                     return tokenType.REGISTER;
                 }
             } else if (i.length() == 2) {
+                System.out.println("reconize " + i);
                 if (((48 <= i.charAt(0) && i.charAt(0) <= 57) || (65 <= i.charAt(0) && i.charAt(0) <= 70))
                         && ((48 <= i.charAt(1) && i.charAt(1) <= 57) || (65 <= i.charAt(1) && i.charAt(1) <= 70))) {
                     return tokenType.NUMBER;
@@ -475,7 +475,7 @@ public class Assembler {
 
     public static void writeMemory() throws IOException {
         String mem = "xx";
-
+        System.out.println(memory);
         for (int i = 0; i < memory.size(); i++) {
 
             String s = Integer.toHexString(Integer.parseInt(memory.get(i), 2));

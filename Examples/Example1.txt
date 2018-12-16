@@ -1,0 +1,10 @@
+LD A,0A
+LD B,0B
+SUB A,B
+JP NZ,Label_Neg
+LD A,00
+LD A,C
+HALT,
+Label_Neg LD A,01
+HALT,
+HALT,
