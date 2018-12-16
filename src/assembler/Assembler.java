@@ -7,7 +7,10 @@ package assembler;
 
 import UI.GUI;
 import static com.sun.corba.se.impl.util.Utility.printStackTrace;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -26,18 +29,20 @@ public class Assembler {
         NONE, REGISTER, HL, NUMBER, MEM, LABEL
     }
 
-    static String[][] s;
+    static String s;
     static Hashtable<String, Integer> labels;
     // static Hashtable<String, Symbol> symbols;
     static ArrayList<Instruction> instructions;
     static ArrayList<String> memory;
     static int memDir = 0;
 
+    static String fileName = "";
+    
     static GUI gui;
 
     public static void main(String[] args) {
         gui = new GUI();
-        int x = -1;
+        String option = "no";
 
         labels = new Hashtable<>();
         instructions = new ArrayList<>();
@@ -45,14 +50,35 @@ public class Assembler {
 
         do {
             System.out.print("");
-            x = gui.ejecutar();
-            if (x == 1) {
-                x = -1;
-                init();
-                ejecutar();
-
+            option = gui.getOption();
+            switch(option){
+                case "ejecutar":
+                    option="no";
+                    init();
+                    ejecutar();
+                    break;
+                case "new":
+                    option="no";
+                    newFile();
+                    break;
+                case "open":
+                    option="no";
+                    openFile("./");
+                    break;
+                case "save":
+                    option="no";
+                    saveFile();
+                    break;
+                case "saveAs":
+                    option="no";
+                    saveFileAs();
+                    break;
+                case "openExample":
+                    option="no";
+                    openFile("./Examples/");;
+                    break;
             }
-        } while (x != 0);
+        } while (option != "exit");
     }
 
     public static void init() {
@@ -65,8 +91,9 @@ public class Assembler {
 
     public static void ejecutar() {
         fillTables();
-
-        for (int i = 0; i < instructions.size(); i++) {
+        return;
+        
+        /*for (int i = 0; i < instructions.size(); i++) {
             if (instructions.get(i).getLabel() != null && instructions.get(i).getLabel() != "") {
                 labels.put(instructions.get(i).getLabel(), -1);
             }
@@ -81,19 +108,57 @@ public class Assembler {
             writeMemory();
         } catch (IOException e) {
             System.out.println("ERROR");
-        }
+        }*/
     }
 
     public static void fillTables() {
-        s = gui.getTable1();
-
-        for (int i = 0; i < s.length; i++) {
+        s = gui.getProgram();
+        
+        String[] ins = s.split("\n");
+        
+        for(String instruction : ins)
+        {
+            String[] aux = instruction.split(",");
+            String[] aux2 = aux[0].split(" ");
+            
+            String label = null, command = null, operator = null, target = null;
+            
+            if(aux2.length == 3)
+            {
+                label=aux2[0];
+                command=aux2[1];
+                operator=aux2[2];
+            }
+            else if(aux2.length == 2)
+            {
+                command=aux2[0];
+                operator=aux2[1]; 
+            }
+            else
+            {
+                command=aux2[1];
+            }
+            
+            if(aux.length == 2)
+            {
+                target=aux[1];
+            }
+            
+            Instruction in = new Instruction(label, command, operator, target);
+            instructions.add(in);
+            
+            System.out.println(in);
+        }
+        
+        return;
+        
+        /*for (int i = 0; i < s.length; i++) {
             Instruction in = new Instruction(s[i][0], s[i][1], s[i][2], s[i][3]);
             instructions.add(in);
             /*
              * if(s[i][0] != null && !s[i][0].equals("")) { labels.put(s[i][0], in); }
              */
-        }
+        
     }
 
     public static String parseInstruction(Instruction ins) {
@@ -430,4 +495,67 @@ public class Assembler {
         writer.close();
     }
 
+    public static void newFile()
+    {
+        fileName = "";
+        gui.setText("");
+    }
+    
+    public static void openFile(String base)
+    {
+        File file = new File(pickFileName(base));
+        
+        String text = "";
+        
+        Scanner scanner = null;
+        try
+        {
+            scanner = new Scanner(file);
+            scanner.useDelimiter("\\Z");
+            text = scanner.next();
+        }
+        catch(Exception e)
+        {
+            
+        }
+        
+        gui.setText(text);
+    }
+    
+    public static void saveFile()
+    {
+        if(fileName == "")
+        {
+            fileName = pickFileName("./");
+        }
+        
+        String text = gui.getProgram();
+        
+        try
+        {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+            writer.write(text);
+            writer.close();
+        }
+        catch(Exception e)
+        {
+            
+        }
+        
+    }
+    
+    public static void saveFileAs()
+    {
+        fileName = pickFileName("./");
+        saveFile();
+    }
+    
+    public static String pickFileName(String base)
+    {   
+        fileName = "";
+        fileName = gui.filePicker(base);
+        System.out.println(fileName);
+        
+        return fileName;
+    }
 }

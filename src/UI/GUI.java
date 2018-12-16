@@ -32,6 +32,17 @@ public class GUI extends JFrame {
     DefaultTableModel t;
     private JTextArea text;
 
+    private JMenuBar menuBar;
+    private JMenu file;
+    private JMenu example;
+    
+    private JMenuItem newP;
+    private JMenuItem open;
+    private JMenuItem save;
+    private JMenuItem saveAs;
+    private JMenuItem exit;
+    private JMenuItem openExample;
+    
     private JButton example1;
     private JButton example2;
     private JButton example3;
@@ -39,7 +50,7 @@ public class GUI extends JFrame {
     private DefaultTableCellRenderer renderer;
     Insets insets;
 
-    private int e;
+    private String option;
 
     public GUI() {
         init();
@@ -47,7 +58,7 @@ public class GUI extends JFrame {
     }
 
     public void init() {
-        e = -1;
+        option = "no";
         setTitle("Z80 Assembler");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
@@ -77,7 +88,7 @@ public class GUI extends JFrame {
             }
 
             private void example1ActionPerformed(ActionEvent event) {
-                example1();
+                //example1();
             }
         });
         example1.setBounds(insets.left + 15, insets.top + top, 100, 30);
@@ -90,7 +101,7 @@ public class GUI extends JFrame {
             }
 
             private void example2ActionPerformed(ActionEvent event) {
-                example2();
+                //example2();
             }
         });
         example2.setBounds(insets.left + 15, insets.top + top + 100, 100, 30);
@@ -103,7 +114,7 @@ public class GUI extends JFrame {
             }
 
             private void example3ActionPerformed(ActionEvent event) {
-                example3();
+                //example3();
             }
         });
         example3.setBounds(insets.left + 15, insets.top + top + 200, 100, 30);
@@ -148,6 +159,63 @@ public class GUI extends JFrame {
          * table1.setVisible(true);
          */
 
+        menuBar = new JMenuBar();
+        menuBar.setBounds(panel.getInsets().left, panel.getInsets().top, panel.getInsets().left+800, panel.getInsets().top+20);
+        file = new JMenu("File");
+        example = new JMenu("Examples");
+        
+        newP = new JMenuItem("New");
+        open = new JMenuItem("Open...");
+        save = new JMenuItem("Save...");
+        saveAs = new JMenuItem("Save As...");
+        exit = new JMenuItem("Exit");
+        openExample = new JMenuItem("Open...");
+        
+        newP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                option = "new";
+            }
+        });
+        open.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                option = "open";
+            }
+        });
+        save.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                option = "save";
+            }
+        });
+        saveAs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                option = "saveAs";
+            }
+        });
+        exit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                dispose();
+                option = "exit";
+            }
+        });
+        openExample.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                option = "openExample";
+            }
+        });
+        
+        
+        file.add(newP);
+        file.add(open);
+        file.add(save);
+        file.add(saveAs);
+        file.add(exit);
+        example.add(openExample);
+        
+        menuBar.add(file);
+        menuBar.add(example);
+        panel.add(menuBar);
+       
+        
         text = new JTextArea();
 
         scrollPane1 = new JScrollPane(text);
@@ -158,10 +226,10 @@ public class GUI extends JFrame {
     }
 
     public void ejecutarActionPerformed(java.awt.event.ActionEvent e) {
-        this.e = 1;
+        this.option = "ejecutar";
     }
 
-    public void addRowActionPerformed(java.awt.event.ActionEvent e) {
+    /*public void addRowActionPerformed(java.awt.event.ActionEvent e) {
         tm.addRow(new Object[] { null, null, null });
     }
 
@@ -174,12 +242,20 @@ public class GUI extends JFrame {
         tm.setRowCount(20);
         tm.fireTableDataChanged();
     }
-
-    public int ejecutar() {
-        return e;
+*/
+    public String getOption() {
+        if(option!=null)
+        {
+            String op = option;
+            option="no";
+            return op;
+        }else
+        {
+            return option;
+        }
     }
 
-    public void example1() {
+   /* public void example1() {
         clearTable();
 
         String[][] s = { { null, "LD", "A", "0A" }, { null, "LD", "B", "0B" }, { null, "SUB", "A", "B" },
@@ -257,7 +333,7 @@ public class GUI extends JFrame {
         }
         return s;
     }
-
+*/
     public String[] getIniValues(String[] sym) {
         IniValuesWindow vWindow = new IniValuesWindow();
         return vWindow.InValues(sym);
@@ -265,5 +341,30 @@ public class GUI extends JFrame {
 
     public void error(String s) {
         JOptionPane.showMessageDialog(this, s);
+    }
+    
+    public String getProgram(){
+        return text.getText();
+    }
+    
+    public void setText(String program){
+        text.setText(program);
+    }
+    
+    public String filePicker(String base)
+    {
+        JFileChooser chooser = new JFileChooser(base);
+        
+        int returnValue = chooser.showOpenDialog(null);
+        
+        if(returnValue == JFileChooser.APPROVE_OPTION)
+        {
+            return chooser.getSelectedFile().getAbsolutePath();
+        }
+        else
+        {
+            
+        }
+        return "";
     }
 }

@@ -56,9 +56,13 @@ public class Instruction
     public void setInstruction(String instruction) {
         this.instruction = instruction;
     }
-}
-
     
+    @Override
+    public String toString()
+    {
+        return (this.label + " " + this.instruction + " " + this.operand + " " + this.parameter);
+    }
+}
 
  
     
