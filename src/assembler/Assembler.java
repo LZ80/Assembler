@@ -117,7 +117,10 @@ public class Assembler {
         
         for(String instruction : ins)
         {
-            instruction = instruction.substring(0, instruction.length()-1);
+            if(instruction.charAt(instruction.length()-1) == 13)
+            {
+                instruction = instruction.substring(0, instruction.length()-1);
+            }
             String[] aux = instruction.split(",");
             String[] aux2 = aux[0].split(" ");
             String label = null, command = null, operator = null, parameter = null;
@@ -130,8 +133,15 @@ public class Assembler {
             }
             else if(aux2.length == 2)
             {
-                command=aux2[0];
-                operator=aux2[1]; 
+                if(isCommand(aux2[0]))
+                {
+                    
+                }
+                else
+                {
+                    label=aux2[0];
+                    command=aux2[1];
+                }
             }
             else
             {
@@ -161,13 +171,6 @@ public class Assembler {
     }
 
     public static void parseInstruction(Instruction ins) {
-        /*
-         * if(ins.getLabel() != null && ins.getLabel() != "") {
-         * labels.put(ins.getLabel(), memDir);
-         * 
-         * }
-         */
-
         switch (ins.getInstruction()) {
         case "LD":
             parseLoad(ins);
@@ -581,5 +584,25 @@ public class Assembler {
             return true;
         }
         return false;
+    }
+
+    public static boolean isCommand(String s)
+    {
+        switch (s) {
+        case "LD":
+            return true;
+        case "ADD":
+            return true;
+        case "SUB":
+            return true;
+        case "JP":
+            return true;
+        case "CP":
+            return true;
+        case "HALT":
+            return true;
+        default:
+            return false;
+        }
     }
 }

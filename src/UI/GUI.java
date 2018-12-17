@@ -81,84 +81,6 @@ public class GUI extends JFrame {
         ejecutar.setBounds(insets.left + left + 250 - 50, insets.top + top + 350 + 50, 100, 30);
         panel.add(ejecutar);
 
-        example1 = new JButton("Ejemplo 1");
-        example1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent event) {
-                example1ActionPerformed(event);
-            }
-
-            private void example1ActionPerformed(ActionEvent event) {
-                //example1();
-            }
-        });
-        example1.setBounds(insets.left + 15, insets.top + top, 100, 30);
-        panel.add(example1);
-
-        example2 = new JButton("Ejemplo 2");
-        example2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent event) {
-                example2ActionPerformed(event);
-            }
-
-            private void example2ActionPerformed(ActionEvent event) {
-                //example2();
-            }
-        });
-        example2.setBounds(insets.left + 15, insets.top + top + 100, 100, 30);
-        panel.add(example2);
-
-        example3 = new JButton("Ejemplo 3");
-        example3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent event) {
-                example3ActionPerformed(event);
-            }
-
-            private void example3ActionPerformed(ActionEvent event) {
-                //example3();
-            }
-        });
-        example3.setBounds(insets.left + 15, insets.top + top + 200, 100, 30);
-        panel.add(example3);
-
-        /*ImageIcon icon = new ImageIcon("icon.png");
-        addRow = new JButton("", icon);
-        addRow.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent event) {
-                addRowActionPerformed(event);
-            }
-        });
-        addRow.setBounds(insets.left + left - 20, insets.top + top, 20, 20);
-        addRow.setBorder(new BevelBorder(BevelBorder.RAISED));
-        panel.add(addRow);
-
-        ImageIcon icon2 = new ImageIcon("icon2.png");
-
-        clearTable = new JButton("", icon2);
-        clearTable.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent event) {
-                clearTableActionPerformed(event);
-            }
-        });
-        clearTable.setBounds(insets.left + left + 500, insets.top + top, 20, 20);
-        clearTable.setBorder(new BevelBorder(BevelBorder.RAISED));
-        panel.add(clearTable);
-
-        renderer = new DefaultTableCellRenderer();
-        renderer.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-*/
-        /*
-         * tm = new DefaultTableModel(new Object[] { "Label", "Instruction", "Operator",
-         * "Parameter" }, 20); table1 = new JTable(tm);
-         * 
-         * table1 = new JTable(tm); table1.setRowHeight(20);
-         * table1.getColumnModel().getColumn(0).setCellRenderer(renderer);
-         * table1.getColumnModel().getColumn(1).setCellRenderer(renderer);
-         * table1.getColumnModel().getColumn(2).setCellRenderer(renderer);
-         * table1.getColumnModel().getColumn(3).setCellRenderer(renderer);
-         * table1.setVisible(true);
-         */
-
         menuBar = new JMenuBar();
         menuBar.setBounds(panel.getInsets().left, panel.getInsets().top, panel.getInsets().left+800, panel.getInsets().top+20);
         file = new JMenu("File");
@@ -229,20 +151,6 @@ public class GUI extends JFrame {
         this.option = "ejecutar";
     }
 
-    /*public void addRowActionPerformed(java.awt.event.ActionEvent e) {
-        tm.addRow(new Object[] { null, null, null });
-    }
-
-    public void clearTableActionPerformed(java.awt.event.ActionEvent e) {
-        clearTable();
-    }
-
-    public void clearTable() {
-        tm.setRowCount(0);
-        tm.setRowCount(20);
-        tm.fireTableDataChanged();
-    }
-*/
     public String getOption() {
         if(option!=null)
         {
@@ -255,24 +163,7 @@ public class GUI extends JFrame {
         }
     }
 
-   /* public void example1() {
-        clearTable();
-
-        String[][] s = { { null, "LD", "A", "0A" }, { null, "LD", "B", "0B" }, { null, "SUB", "A", "B" },
-                { null, "JP", "NZ", "Label_Neg" }, { null, "LD", "A", "00" }, { null, "LD", "A", "C" },
-                { null, "HALT", "", "" }, { "Label_Neg", "LD", "A", "01" }, { null, "HALT", "", "" } };
-
-        for (int i = 0; i < 9; i++) {
-            if (table1.getRowCount() <= s.length) {
-                tm.addRow(new Object[] { null, null, null, null });
-            }
-            table1.setValueAt(s[i][0], i, 0);
-            table1.setValueAt(s[i][1], i, 1);
-            table1.setValueAt(s[i][2], i, 2);
-            table1.setValueAt(s[i][3], i, 3);
-        }
-    }
-
+   /*
     public void example2() {
         clearTable();
 
@@ -310,29 +201,7 @@ public class GUI extends JFrame {
         }
     }
 
-    public String[][] getTable1() {
-        e = -1;
-        int x = table1.getColumnCount();
 
-        int y = table1.getRowCount();
-
-        for (int i = 0; i < table1.getRowCount(); i++) {
-            if (table1.getValueAt(i, 1) == null || table1.getValueAt(i, 1) == "") {
-                y = i;
-                break;
-            }
-        }
-
-        String[][] s = new String[y][x];
-
-        for (int i = 0; i < y; i++) {
-
-            for (int j = 0; j < x; j++) {
-                s[i][j] = (String) table1.getValueAt(i, j);
-            }
-        }
-        return s;
-    }
 */
     public String[] getIniValues(String[] sym) {
         IniValuesWindow vWindow = new IniValuesWindow();
