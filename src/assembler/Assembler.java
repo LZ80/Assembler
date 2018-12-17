@@ -135,7 +135,8 @@ public class Assembler {
             {
                 if(isCommand(aux2[0]))
                 {
-                    
+                    command=aux2[0];
+                    operator=aux2[1];
                 }
                 else
                 {
