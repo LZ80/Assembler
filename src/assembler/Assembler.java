@@ -26,7 +26,7 @@ public class Assembler {
      */
 
     public enum tokenType {
-        NONE, REGISTER, HL, NUMBER, MEM, LABEL
+        NONE, REGISTER, HL, NUMBER, MEM, LABEL, IX, IY, D_NUMBER
     }
 
     static String s;
@@ -416,13 +416,28 @@ public class Assembler {
                     return tokenType.NUMBER;
                 }
             } else if (i.length() == 4) {
-                if (i.charAt(0) == '(' && i.charAt(3) == ')') {
+                if (i.charAt(0) == '(' && i.charAt(i.length()-1) == ')') {
                     if (i.charAt(1) == 'H' && i.charAt(2) == 'L') {
                         return tokenType.HL;
                     }
                 }
+                else if(isHexNumber(i.charAt(0)) && isHexNumber(i.charAt(1)) && isHexNumber(i.charAt(2)) && isHexNumber(i.charAt(3)))
+                {
+                    return tokenType.D_NUMBER;
+                }
+                
             } else if (i.length() == 6) {
                 return tokenType.MEM;
+            }else if(i.length() == 7)
+            {
+                if(i.charAt(2) == 'X')
+                {
+                    return tokenType.IX;
+                }else if(i.charAt(2)== 'Y')
+                {
+                    return tokenType.IY;
+                }
+                
             }
         }
         return tokenType.NONE;
@@ -557,5 +572,14 @@ public class Assembler {
         System.out.println(fileName);
         
         return fileName;
+    }
+    
+    public static boolean isHexNumber(char s)
+    {
+        if (((48 <= s && s <= 57) || (65 <= s && s <= 70))) 
+        {
+            return true;
+        }
+        return false;
     }
 }

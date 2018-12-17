@@ -7,4 +7,3 @@ LD A,C
 HALT,
 Label_Neg LD A,01
 HALT,
-HALT,
