@@ -1,0 +1,6 @@
+LD B,02
+LD C,FF
+Label_Start LD A,B
+LD A,C
+JP NZ,Label_Start
+HALT,

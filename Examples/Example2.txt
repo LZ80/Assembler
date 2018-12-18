@@ -1,0 +1,12 @@
+LD B,02
+LD C,03
+Label_Start LD A,B
+ADD A,A
+LD B,A
+LD A,C
+LD D,01
+SUB A,D
+LD C,A
+JP NZ,Label_Finish
+JP,Label_Start
+Label_Finish HALT,
