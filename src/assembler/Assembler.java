@@ -214,6 +214,8 @@ public class Assembler {
         
         tokenType o = recognizePattern(ins.getOperand());
         tokenType p = recognizePattern(ins.getParameter());
+        
+        System.out.println(o + " " + p);
 
         if ((o == tokenType.REGISTER || o == tokenType.HL) && (p == tokenType.REGISTER || p == tokenType.HL)) {
 
@@ -377,7 +379,7 @@ public class Assembler {
             memory.add(s[3]);
             memDir += 4;
         }
-        else if(o == tokenType.IX && p == tokenType.MEM)
+        else if(p == tokenType.IX && o == tokenType.MEM)
         {
             s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("DD", 16));
             s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("22", 16));
@@ -390,7 +392,7 @@ public class Assembler {
             memory.add(s[3]);
             memDir += 4;
         }
-        else if(o == tokenType.IY && p == tokenType.MEM)
+        else if(p == tokenType.IY && o == tokenType.MEM)
         {
             s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("FD", 16));
             s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("22", 16));
@@ -642,11 +644,11 @@ public class Assembler {
                         && ((48 <= i.charAt(1) && i.charAt(1) <= 57) || (65 <= i.charAt(1) && i.charAt(1) <= 70))) {
                     return tokenType.NUMBER;
                 }
-                if(i == "IX")
+                if(i.equals("IX"))
                 {
                     return tokenType.IX;
                 }
-                else if(i == "IY")
+                else if(i.equals("IY"))
                 {
                     return tokenType.IY;
                 }
@@ -660,7 +662,6 @@ public class Assembler {
                 {
                     return tokenType.D_NUMBER;
                 }
-                
             } else if (i.length() == 6) {
                 return tokenType.MEM;
             }else if(i.length() == 7)
