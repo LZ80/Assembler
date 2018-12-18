@@ -236,4 +236,9 @@ public class GUI extends JFrame {
         }
         return "";
     }
+    
+    public void memoryGenerated()
+    {
+        JOptionPane.showMessageDialog(this, "Memory file generated");
+    }
 }

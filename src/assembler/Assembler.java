@@ -780,6 +780,8 @@ public class Assembler {
         writer.write(mem);
 
         writer.close();
+        
+        gui.memoryGenerated();
     }
 
     public static void newFile()
