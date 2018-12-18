@@ -26,7 +26,7 @@ public class Assembler {
      */
 
     public enum tokenType {
-        NONE, REGISTER, HL, NUMBER, MEM, LABEL, IX, IY, D_NUMBER
+        NONE, REGISTER, HL, NUMBER, MEM, LABEL, IXP, IYP, D_NUMBER, IX, IY
     }
 
     static String s;
@@ -92,6 +92,7 @@ public class Assembler {
     public static void ejecutar() {
         fillTables();
         
+        System.out.println("----------------------PARSER---------------------");
         for (int i = 0; i < instructions.size(); i++) {
             if (instructions.get(i).getLabel() != null && instructions.get(i).getLabel() != "") {
                 labels.put(instructions.get(i).getLabel(), -1);
@@ -111,6 +112,8 @@ public class Assembler {
     }
 
     public static void fillTables() {
+        System.out.println("FILL INSTRUCTIONS");
+        
         s = gui.getProgram();
         
         String[] ins = s.split("\n");
@@ -157,7 +160,7 @@ public class Assembler {
             Instruction in = new Instruction(label, command, operator, parameter);
             instructions.add(in);
             
-            System.out.println("fillTables " + in);
+            System.out.println(in);
         }
         
         return;
@@ -172,6 +175,7 @@ public class Assembler {
     }
 
     public static void parseInstruction(Instruction ins) {
+        System.out.print(ins + ": ");
         switch (ins.getInstruction()) {
         case "LD":
             parseLoad(ins);
@@ -200,91 +204,308 @@ public class Assembler {
     }
 
     public static String parseLoad(Instruction ins) {
-        String s = "";
-        System.out.println(ins.getParameter());
+        
+        String[] s = new String[4];
+        
+        for(int i=0; i<4; i++)
+        {
+            s[i] = "";
+        }
+        
         tokenType o = recognizePattern(ins.getOperand());
         tokenType p = recognizePattern(ins.getParameter());
-        System.out.println("ins " + ins.getInstruction());
-        System.out.println(ins.getParameter() + "p " + p);
 
         if ((o == tokenType.REGISTER || o == tokenType.HL) && (p == tokenType.REGISTER || p == tokenType.HL)) {
 
-            s = s + "01" + parseRegister(ins.getOperand()) + parseRegister(ins.getParameter());
-            memory.add(s);
+            s[0] = s[0] + "01" + parseRegister(ins.getOperand()) + parseRegister(ins.getParameter());
+            
+            memory.add(s[0]);
             memDir++;
+            
         } else if ((o == tokenType.REGISTER || o == tokenType.HL) && p == tokenType.NUMBER) {
-            s = s + "00" + parseRegister(ins.getOperand()) + "110";
-
-            memory.add(s);
-            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter(), 16)));
+            
+            s[0] = s[0] + "00" + parseRegister(ins.getOperand()) + "110";
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt(ins.getParameter(), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
             memDir += 2;
+            
         } else if (o == tokenType.REGISTER && p == tokenType.MEM) {
-            s = s + Integer.toBinaryString(Integer.parseInt("3A", 16));
-
-            memory.add(s);
-            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3, 5), 16)));
-            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1, 3), 16)));
-
+            
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("3A", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3, 5), 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1, 3), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
             memDir += 3;
         } else if (o == tokenType.REGISTER && p == tokenType.LABEL) {
-            System.out.println("sadas");
-
-            s = s + Integer.toBinaryString(Integer.parseInt("3A", 16));
 
             int m = labels.get(ins.getParameter());
-
             String a = String.format("%04X", m);
-
-            memory.add(s);
-            memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(2, 4), 16)));
-            memory.add(Integer.toBinaryString(Integer.parseInt(a.substring(0, 2), 16)));
-
+            
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("3A", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt(a.substring(2, 4), 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(a.substring(0, 2), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
             memDir += 3;
         }
-
+        else if(o == tokenType.REGISTER && p == tokenType.IXP)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("DD", 16));
+            s[1] = s[1] + "01" + parseRegister(ins.getOperand()) + "110";
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(4,6), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memDir += 3;
+        }
+        else if(o == tokenType.REGISTER && p == tokenType.IYP)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("FD", 16));
+            s[1] = s[1] + "01" + parseRegister(ins.getOperand()) + "110";
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(4,6), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memDir += 3;
+        }
+        else if(o == tokenType.IXP && p == tokenType.REGISTER)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("DD", 16));
+            s[1] = s[1] + "01" +  "110" + parseRegister(ins.getOperand());
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getOperand().substring(4,6), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memDir += 3;
+        }
+        else if(o == tokenType.IYP && p == tokenType.REGISTER)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("FD", 16));
+            s[1] = s[1] + "01" +  "110" + parseRegister(ins.getOperand());
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getOperand().substring(4,6), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memDir += 3;
+        }
+        else if(o == tokenType.IXP && p == tokenType.NUMBER)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("DD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("36", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getOperand().substring(4,6), 16));
+            s[3] = s[3] + Integer.toBinaryString(Integer.parseInt(ins.getParameter(),16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memory.add(s[3]);
+            memDir += 4;
+        }
+        else if(o == tokenType.IYP && p == tokenType.NUMBER)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("FD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("36", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getOperand().substring(4,6), 16));
+            s[3] = s[3] + Integer.toBinaryString(Integer.parseInt(ins.getParameter(),16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memory.add(s[3]);
+            memDir += 4;
+        }
+        else if(o == tokenType.IX && p == tokenType.D_NUMBER)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("DD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("21", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(2), 16));
+            s[3] = s[3] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(0,2),16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memory.add(s[3]);
+            memDir += 4;
+        }
+        else if(o == tokenType.IY && p == tokenType.D_NUMBER)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("FD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("21", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(2), 16));
+            s[3] = s[3] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(0,2),16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memory.add(s[3]);
+            memDir += 4;
+        }
+        else if(o == tokenType.IX && p == tokenType.MEM)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("DD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("2A", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5), 16));
+            s[3] = s[3] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memory.add(s[3]);
+            memDir += 4;
+        }
+        else if(o == tokenType.IY && p == tokenType.MEM)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("FD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("2A", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5), 16));
+            s[3] = s[3] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memory.add(s[3]);
+            memDir += 4;
+        }
+        else if(o == tokenType.IX && p == tokenType.MEM)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("DD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("22", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5), 16));
+            s[3] = s[3] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memory.add(s[3]);
+            memDir += 4;
+        }
+        else if(o == tokenType.IY && p == tokenType.MEM)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("FD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("22", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(3,5), 16));
+            s[3] = s[3] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(1,3),16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memory.add(s[3]);
+            memDir += 4;
+        }
+        
+        
+        writeLog(s);
         return "";
     }
 
     public static String parseAdd(Instruction ins) {
-        String s = "";
+        String[] s = new String[4];
+        for(int i=0; i<4; i++)
+        {
+            s[i] = "";
+        }
 
         tokenType o = recognizePattern(ins.getOperand());
         tokenType p = recognizePattern(ins.getParameter());
 
         if ((o == tokenType.REGISTER) && (p == tokenType.REGISTER || p == tokenType.HL)) {
 
-            s = s + "10000" + parseRegister(ins.getParameter());
-            memory.add(s);
+            s[0] = s[0] + "10000" + parseRegister(ins.getParameter());
+            memory.add(s[0]);
             memDir++;
         } else if ((o == tokenType.REGISTER) && p == tokenType.NUMBER) {
-            s = s + "11000" + "110";
-
-            memory.add(s);
-            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter(), 16)));
+            s[0] = s[0] + "11000" + "110";
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt(ins.getParameter(), 16));
+            
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
             memDir += 2;
         }
+        else if(o == tokenType.REGISTER && p == tokenType.IXP)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("DD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("86", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(4,6), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memDir += 3;
+        }
+        else if(o == tokenType.REGISTER && p == tokenType.IYP)
+        {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("FD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("86", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(4,6), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memDir += 3;
+        }
+        writeLog(s);
         return "";
     }
 
     public static String parseSub(Instruction ins) {
-        String s = "";
+        String[] s = new String[4];
+        
+        for(int i=0; i<4; i++)
+        {
+            s[i] = "";
+        }
 
         tokenType o = recognizePattern(ins.getOperand());
         tokenType p = recognizePattern(ins.getParameter());
 
         if ((o == tokenType.REGISTER) && (p == tokenType.REGISTER || p == tokenType.HL)) {
 
-            s = s + "10010" + parseRegister(ins.getParameter());
-            memory.add(s);
+            s[0] = s[0] + "10010" + parseRegister(ins.getParameter());
+            memory.add(s[0]);
             memDir++;
         } else if ((o == tokenType.REGISTER) && p == tokenType.NUMBER) {
-            s = s + "11010" + "110";
-
-            memory.add(s);
-            memory.add(Integer.toBinaryString(Integer.parseInt(ins.getParameter(), 16)));
+            s[0] = s[0] + "11010" + "110";
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt(ins.getParameter(), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
             memDir += 2;
+        } 
+        else if ((o == tokenType.REGISTER) && p == tokenType.IXP) {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("DD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("96", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(4,6), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memDir += 3;
+        }
+        else if ((o == tokenType.REGISTER) && p == tokenType.IYP) {
+            s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("FD", 16));
+            s[1] = s[1] + Integer.toBinaryString(Integer.parseInt("96", 16));
+            s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getParameter().substring(4,6), 16));
+            
+            memory.add(s[0]);
+            memory.add(s[1]);
+            memory.add(s[2]);
+            memDir += 3;
         }
 
+        writeLog(s);
+        
         return "";
     }
 
@@ -341,7 +562,9 @@ public class Assembler {
                     memDir += 3;
                 }
             } else if (ins.getOperand().equals("NZ")) {
+                System.out.println("NZ");
                 if (p == tokenType.MEM) {
+                    System.out.println("Mem");
                     s = s + Integer.toBinaryString(Integer.parseInt("C2", 16));
 
                     memory.add(s);
@@ -350,6 +573,7 @@ public class Assembler {
 
                     memDir += 3;
                 } else if (p == tokenType.LABEL) {
+                    
                     s = s + Integer.toBinaryString(Integer.parseInt("C2", 16));
 
                     int m = labels.get(ins.getParameter());
@@ -414,10 +638,17 @@ public class Assembler {
                     return tokenType.REGISTER;
                 }
             } else if (i.length() == 2) {
-                System.out.println("reconize " + i);
                 if (((48 <= i.charAt(0) && i.charAt(0) <= 57) || (65 <= i.charAt(0) && i.charAt(0) <= 70))
                         && ((48 <= i.charAt(1) && i.charAt(1) <= 57) || (65 <= i.charAt(1) && i.charAt(1) <= 70))) {
                     return tokenType.NUMBER;
+                }
+                if(i == "IX")
+                {
+                    return tokenType.IX;
+                }
+                else if(i == "IY")
+                {
+                    return tokenType.IY;
                 }
             } else if (i.length() == 4) {
                 if (i.charAt(0) == '(' && i.charAt(i.length()-1) == ')') {
@@ -436,10 +667,10 @@ public class Assembler {
             {
                 if(i.charAt(2) == 'X')
                 {
-                    return tokenType.IX;
+                    return tokenType.IXP;
                 }else if(i.charAt(2)== 'Y')
                 {
-                    return tokenType.IY;
+                    return tokenType.IYP;
                 }
                 
             }
@@ -474,27 +705,63 @@ public class Assembler {
         int m = 0;
 
         for (int i = 0; i < instructions.size(); i++) {
-            String label = instructions.get(i).getLabel();
+            
+            Instruction instruction = instructions.get(i);
+            String label = instruction.getLabel();
 
-            tokenType p = recognizePattern(instructions.get(i).getParameter());
+            tokenType p = recognizePattern(instruction.getParameter());
+            tokenType o = recognizePattern(instruction.getOperand());
 
-            if (label != null && label != "") {
+            if (label != null && label.equals("")) {
                 labels.put(label, m);
             }
-
-            if (p == tokenType.NUMBER) {
-                m += 2;
-            } else if (p == tokenType.MEM || p == tokenType.LABEL) {
-                m += 3;
-            } else {
-                m++;
+            
+            if(instruction.getInstruction().equals("LD"))
+            {
+                if ((o == tokenType.IX || o == tokenType.IY) || (p == tokenType.IX || p == tokenType.IY))
+                {
+                    m+=4;
+                }
+                else if((o == tokenType.IXP || o == tokenType.IYP) && p == tokenType.NUMBER)
+                {
+                    m+=4;
+                }
+                else if((o == tokenType.IXP || o == tokenType.IYP) && p == tokenType.REGISTER)
+                {
+                    m+=3;
+                }
+                else if((p == tokenType.IXP || p == tokenType.IYP) && o == tokenType.REGISTER)
+                {
+                    m+=3;
+                }
+                else if(p == tokenType.MEM || p == tokenType.LABEL)
+                {
+                    m+=3;
+                }
+                else if(p == tokenType.NUMBER)
+                {
+                    m+=2;
+                }
+                else
+                {
+                    m++;
+                }
+            }
+            else
+            {
+                if (p == tokenType.NUMBER || p == tokenType.IX || p == tokenType.IY) {
+                    m += 2;
+                } else if (p == tokenType.MEM || p == tokenType.LABEL || p == tokenType.IXP || p == tokenType.IYP) {
+                    m += 3;
+                } else {
+                    m++;
+                }
             }
         }
     }
 
     public static void writeMemory() throws IOException {
         String mem = "xx";
-        System.out.println(memory);
         for (int i = 0; i < memory.size(); i++) {
 
             String s = Integer.toHexString(Integer.parseInt(memory.get(i), 2));
@@ -605,5 +872,26 @@ public class Assembler {
         default:
             return false;
         }
+    }
+    
+    public static void writeLog(String[] s)
+    {
+        for(int i=0; i<4; i++)
+        {
+            try{
+            s[i] = Integer.toHexString(Integer.parseInt(s[i],2));
+            
+            if (s[i].length() == 1) {
+
+                s[i] = "0" + s[i];
+            }
+            }
+            catch(Exception e)
+            {
+                
+            }
+            System.out.print(s[i] + " ");
+        }
+        System.out.println();
     }
 }
