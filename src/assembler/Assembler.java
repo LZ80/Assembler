@@ -293,7 +293,7 @@ public class Assembler {
         else if(o == tokenType.IYP && p == tokenType.REGISTER)
         {
             s[0] = s[0] + Integer.toBinaryString(Integer.parseInt("FD", 16));
-            s[1] = s[1] + "01" +  "110" + parseRegister(ins.getOperand());
+            s[1] = s[1] + "01" +  "110" + parseRegister(ins.getParameter());
             s[2] = s[2] + Integer.toBinaryString(Integer.parseInt(ins.getOperand().substring(4,6), 16));
             
             memory.add(s[0]);
