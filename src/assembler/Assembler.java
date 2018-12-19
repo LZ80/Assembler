@@ -713,7 +713,7 @@ public class Assembler {
             tokenType p = recognizePattern(instruction.getParameter());
             tokenType o = recognizePattern(instruction.getOperand());
 
-            if (label != null && label.equals("")) {
+            if (label != null && !label.equals("")) {
                 labels.put(label, m);
             }
             
